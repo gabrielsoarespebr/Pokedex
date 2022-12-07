@@ -1,22 +1,22 @@
 const offset = 0;
-const limit = 10;
+const limit = 100;
 
 const url = `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`;
 
 function convertPokemonToLi(pokemon) {
-    return `<li class="pokemon">
+    return `<li class="pokemon ${pokemon.types[0].type.name}">
     <div class="pokemon-info-head">
         <span class="pokemon-name">${pokemon.name}</span>
-        <span class="pokemon-code">001</span>
+        <span class="pokemon-code">${pokemon.id.toString().padStart(3, '0')}</span>
     </div>
     <div class="pokemon-info-body">
         <ol class="pokemon-type-list">
-            <li class="pokemon-type">grass</li>
-            <li class="pokemon-type">poison</li>
+            <li class="pokemon-type ${pokemon.types[0].type.name}">${pokemon.types[0].type.name}</li>
+            <li class="pokemon-type ${pokemon.types[1].type.name}">${pokemon.types[1].type.name}</li>
         </ol>
 
         <img class="pokemon-image"
-            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/1.svg"
+            src="${pokemon.sprites.other.dream_world.front_default}"
             alt="${pokemon.name}">
     </div>
 </li>`;
@@ -28,8 +28,10 @@ fetch(url)
     .then(responseTxt => responseTxt.json())
     .then(responseJson => responseJson.results)
     .then(pokemonList => {
-        for(let i=0;i<pokemonList.length;i++){
-            pokemonListHtml.innerHTML += convertPokemonToLi(pokemonList[i]);
+        for (let i = 0; i < pokemonList.length; i++) {
+            fetch(pokemonList[i].url)
+                .then(responseTxt => responseTxt.json())
+                .then(pokemonDetails => pokemonListHtml.innerHTML += convertPokemonToLi(pokemonDetails));
         }
     });
 
